@@ -1,72 +1,66 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const UserSchema = mongoose.Schema({
-    firstname: {
+  firstname: {
+    type: String,
+    required: true,
+  },
+  lastname: {
+    type: String,
+    required: true,
+  },
+  gender: {
+    type: String,
+    required: false,
+  },
+  role: {
+    type: String,
+    required: true,
+  },
+  birthday: {
+    type: Date,
+    required: false,
+    default: "1900-01-01"
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  password: {
+    type: String,
+    required: true,
+  },
+  account_created: {
+    type: Date,
+    default: Date.now,
+  },
+  isVerified: {
+    type: Boolean,
+    default: false,
+  },
+  photo: {
+    type: String,
+    default: "http://localhost:4000/uploads/default-man.jpg",
+  },
+  biography: {
+    type: String,
+  },
+  phone: {
+    type: String,
+  },
+  purchasedWorkshopsList: [
+    {
+      workshopId: {
         type: String,
         required: true,
-    },
-    lastname: {
-        type: String,
-        required: true,
-    },
-    gender: {
-        type: String,
-        required: false,
-    },
-    role: {
-        type: String,
-        required: true,
-    },
-    birthday: {
+      },
+      purchasedDate: {
         type: Date,
-        required: false,
+        default: Date.now(),
+      },
     },
-    email: {
-        type: String,
-        required: true,
-        unique: true,
-    },
-    password: {
-        type: String,
-        required: true,
-    },
-    account_created: {
-        type: Date,
-        default: Date.now
-    },
-    isVerified: {
-        type: Boolean,
-        default: false,
-    },
-    permitions: {
-        isAdmin: {
-            type: Boolean,
-            default: false,
-        },
-        isTeacher: {
-            type: Boolean,
-            default: false,
-        },
-        isPsychologist: {
-            type: Boolean,
-            default: false,
-        },
-        isStudent: {
-            type: Boolean,
-            default: true,
-        },
-
-    },
-    // createdCourseList: {
-    //     courseId,
-    //     createdAt
-    // },
-    // purchasedCourseList: {
-    //     courseId,
-    //     purchasedDate,
-    // },
-
-
+  ],
 });
 
-module.exports = mongoose.model('User', UserSchema)
+module.exports = mongoose.model("User", UserSchema);

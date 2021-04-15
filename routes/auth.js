@@ -26,52 +26,18 @@ router.post('/login', async(req, res) => {
 
 router.post('/registration', async(req, res) => {
     const { error } = RegisterValidation(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
-
-    var permitions = req.body.permitions;
-    if (permitions == null) {
-        switch (req.body.role) {
-            case "admin":
-                permitions = {
-                    isAdmin: true,
-                    isTeacher: false,
-                    isStudent: false,
-                    isPsychologist: false,
-                }
-                break;
-            case "student":
-                permitions = {
-                    isAdmin: false,
-                    isTeacher: false,
-                    isStudent: true,
-                    isPsychologist: false,
-                }
-                break;
-            case "teacher":
-                permitions = {
-                    isAdmin: false,
-                    isTeacher: true,
-                    isStudent: false,
-                    isPsychologist: false,
-                }
-                break;
-            case "psychologist":
-                permitions = {
-                    isAdmin: false,
-                    isTeacher: false,
-                    isStudent: false,
-                    isPsychologist: true,
-                }
-                break;
-            default:
-
-        }
-
+    if (error) {
+        return res.status(400).json({message: error.details[0].message});
     }
+    if (req.body.password != req.body.confirm_password) {
 
+        return res.status(400).json({ message: 'passwords does not match!' });
+    }
     //checking is the user is in DB
     const emailExists = await Users.findOne({ email: req.body.email });
-    if (emailExists) return res.status(400).send("Email already exists");
+    if (emailExists) {
+        return res.status(400).json({message: "Email already exists"});
+    }
 
     //password hashing
     const salt = await bcrypt.genSalt(10);
@@ -88,10 +54,9 @@ router.post('/registration', async(req, res) => {
     });
     try {
         const savedUser = await user.save();
-
-        res.send({ message: "success", user: savedUser });
+        res.json({ user: savedUser });
     } catch (error) {
-        res.status(400).send(error);
+        res.status(400).json({message: error});
     }
 });
 

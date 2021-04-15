@@ -17,6 +17,7 @@ const RegisterValidation = (newUser) => {
         lastname: Joi.string().required(),
         email: Joi.string().required().email(),
         password: Joi.string().min(6).required(),
+        confirm_password: Joi.string().min(6).required(),
     });
 
     return Schema.validate(newUser);
@@ -34,10 +35,10 @@ function generateRefreshToken(user) {
 const isLoggedIn = (req, res, next) => {
     const authHeader = req.header['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
-    if (!token) return res.status(401).send({ message: "access denided" });
+    if (!token) return res.status(401).json({ message: "access denided" });
 
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (error, user) => {
-        if (error) return res.status(403).send("token is invalid");
+        if (error) return res.status(403).json({message: "token is invalid"});
         req.user = user;
         next();
     })
@@ -45,10 +46,10 @@ const isLoggedIn = (req, res, next) => {
 const isAdministrator = (req, res, next) => {
     const authHeader = req.header['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
-    if (!token) return res.status(401).send({ message: "access denided" });
+    if (!token) return res.status(401).json({ message: "access denided" });
 
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (error, user) => {
-        if (error) return res.status(403).send("token is invalid");
+        if (error) return res.status(403).json("token is invalid");
         if (user.role != "admin") {
             return res.status(403).json({ message: "access denided - you don't have permition!" })
         }
@@ -57,6 +58,22 @@ const isAdministrator = (req, res, next) => {
     })
 }
 
+function FormatDate(varDate) {
+    let date_ob = new Date(varDate);
+    // adjust 0 before single digit date
+    let date = ("0" + date_ob.getDate()).slice(-2);
+    // current month
+    let month = ("0" + (date_ob.getMonth() + 1)).slice(-2);
+
+    // current year
+    let year = date_ob.getFullYear();
+
+    // current hours
+    let hours = date_ob.getUTCHours();
+    // current minutes
+    let minutes = date_ob.getMinutes();
+    return year + "-" + month + "-" + date + " " + hours + ":" + minutes
+}
 
 module.exports.RegisterValidation = RegisterValidation;
 module.exports.LoginValidation = LoginValidation;
@@ -64,3 +81,4 @@ module.exports.generateAccessToken = generateAccessToken;
 module.exports.generateRefreshToken = generateRefreshToken;
 module.exports.isLoggedIn = isLoggedIn;
 module.exports.isAdministrator = isAdministrator;
+module.exports.FormatDate = FormatDate;

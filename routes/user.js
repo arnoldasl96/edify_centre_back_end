@@ -1,17 +1,30 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
+const Workshop = require('../models/Workshop');
 const { isAdministrator, isLoggedIn } = require('./VerificationFunctions');
 
-router.get('/', isAdministrator, (req, res) => {
+
+router.get('/', async(req, res) => {
+    if (req.query === {}) {
         try {
             const posts = await User.find();
             res.json(posts);
         } catch (err) {
             res.json({ message: err })
         }
-    })
-    //SPECIFIC USER
+    } else {
+        try {
+            const posts = await User.find(req.query);
+            res.json(posts);
+        } catch (err) {
+            res.json({ message: err })
+        }
+    }
+
+})
+
+//SPECIFIC USER
 router.get('/:userId', async(req, res) => {
     try {
         const post = await User.findById(req.params.userId);
@@ -22,9 +35,27 @@ router.get('/:userId', async(req, res) => {
     }
 })
 
+router.get('/:userId/workshops', async(req, res) => {
+    try {
+        const workshopsList = []
+        const user = await User.findById(req.params.userId);
+        if (user) {
+            const userWorkshopsids = user.purchasedWorkshopsList;
+            for (let id = 0; id < userWorkshopsids.length; id++) {
+                const element = userWorkshopsids[id];
+                const workshop = await Workshop.findById(element.workshopId);
+                workshopsList.push(workshop);
+            }
+            res.json(workshopsList)
+        }
+    } catch (error) {
+        res.json({ message: error });
+    }
+})
+
 // DELETE 1
 
-router.delete('/:userId', isAdministrator, async(req, res) => {
+router.delete('/:userId', async(req, res) => {
         try {
             const post = await User.remove({ _id: req.params.userId });
             res.json(post);
@@ -36,13 +67,16 @@ router.delete('/:userId', isAdministrator, async(req, res) => {
     })
     //UPDATE
 
-router.patch('/:userId', (isAdministrator || isLoggedIn), async(req, res) => {
+router.patch('/:id', async(req, res) => {
     try {
-        const post = await User.updateOne({ _id: req.params.userId }, { $set: { name: req.body.name, email: req.body.email, password: req.body.password } });
-        res.json(post);
+        const id = req.params.id;
+        const update= req.body;
+        const post = await User.findByIdAndUpdate(id, update);
+        res.status(204).json(post);
 
     } catch (err) {
         res.json({ message: err });
     }
 
 })
+module.exports = router;

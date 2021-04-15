@@ -1,0 +1,30 @@
+const express = require('express');
+const router = express.Router();
+const Session = require('../models/Session')
+
+router.post('/', async(req, res) => {
+    const NewSession = new Session({
+        title: req.body.title,
+        description: req.body.description,
+        files: req.body.files,
+        attendance_date: req.body.attendance_date,
+        teachers: req.body.teachers,
+        status: req.body.status
+    })
+    try {
+        const savedSession = await NewSession.save();
+        res.json({ message: "success", SessionId: savedSession._id });
+    } catch (error) {
+        res.status(400).json({message: error});
+    }
+})
+router.delete('/:id', async(req,res)=>{
+    try {
+        
+    const deletedSession = await Session.remove({_id: req.params.id});
+    res.json({deleted: deletedSession})
+    } catch (error) {
+        res.json({message: error})
+    }
+})
+module.exports = router;
