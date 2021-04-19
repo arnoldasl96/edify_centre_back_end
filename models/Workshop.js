@@ -1,54 +1,66 @@
-const mongoose = require('mongoose');
-
+const mongoose = require("mongoose");
 
 const WorkshopSchema = mongoose.Schema({
-    title: {
-        type: String,
-        required: true,
+  title: {
+    type: String,
+    required: true,
+  },
+  category: {
+    type: String,
+    required: true,
+  },
+  date: {
+    ComingSoon: {
+      type: Boolean,
+      default: false,
     },
-    category: {
-        type: String,
-        required: true,
+    from: {
+      type: Date,
     },
-    date: {
-        from: {
-            type: Date,
-        },
-        to: {
-            type: Date
-        }
+    to: {
+      type: Date,
     },
-    description: {
-        type: String,
-    },
-    files: [{}],
-    hours: {
-        type: Number,
-    },
-    price: {
-        type: Number,
-    },
-    short_description: {
-        type: String,
-    },
+  },
+  description: {
+    type: String,
+  },
+  files: [{}],
+  hours: {
+    type: Number,
+  },
+  price: {
+    type: Number,
+  },
+  short_description: {
+    type: String,
+  },
 
-    responsible_person: [{
-
-    }],
-    sessions: [{
-
-    }],
-    status: {
-        type: String,
-        required: true,
+  responsible_person: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
     },
-    students_list: [{
-
-    }],
-    Workshop_created: {
-        type: Date,
-        default: Date.now,
-    }
+  ],
+  sessions: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Session",
+    },
+  ],
+  status: {
+    type: String,
+    required: true,
+  },
+  students_list: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+  ],
+  Workshop_created: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
-module.exports = mongoose.model('Workshop', WorkshopSchema);
+module.exports = mongoose.model("Workshop", WorkshopSchema);

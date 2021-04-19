@@ -20,7 +20,7 @@ const UserSchema = mongoose.Schema({
   birthday: {
     type: Date,
     required: false,
-    default: "1900-01-01"
+    default: "1900-01-01",
   },
   email: {
     type: String,
@@ -52,7 +52,8 @@ const UserSchema = mongoose.Schema({
   purchasedWorkshopsList: [
     {
       workshopId: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Workshop",
         required: true,
       },
       purchasedDate: {

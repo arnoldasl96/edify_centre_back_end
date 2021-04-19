@@ -15,6 +15,7 @@ router.post('/', async(req, res) => {
         const savedSession = await NewSession.save();
         res.json({ message: "success", SessionId: savedSession._id });
     } catch (error) {
+        console.log(error);
         res.status(400).json({message: error});
     }
 })
@@ -26,5 +27,17 @@ router.delete('/:id', async(req,res)=>{
     } catch (error) {
         res.json({message: error})
     }
+})
+router.patch('/:id', async(req,res)=>{
+    try {
+        const id = req.params.id;
+        const update= req.body;
+        const post = await Session.findByIdAndUpdate({_id:id},update);
+        res.status(204).json({ session:post});
+
+    } catch (err) {
+        res.json({ message: err });
+    }
+
 })
 module.exports = router;

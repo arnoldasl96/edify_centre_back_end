@@ -2,12 +2,12 @@ const mongoose = require('mongoose');
 
 const WorkshopBookingSchema = mongoose.Schema({
     workshopId: {
-        type: String,
-        required: true
+        type: mongoose.Schema.Types.ObjectId,
+        ref : "Workshop"
     },
     userId: {
-        type: String,
-        required: true
+        type: mongoose.Schema.Types.ObjectId,
+        ref : "User"
     },
     status: {
         type: String,
