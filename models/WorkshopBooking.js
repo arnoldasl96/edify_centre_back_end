@@ -1,17 +1,18 @@
 const mongoose = require('mongoose');
 
 const WorkshopBookingSchema = mongoose.Schema({
-    workshopId: {
+    workshop: {
         type: mongoose.Schema.Types.ObjectId,
         ref : "Workshop"
     },
-    userId: {
+    user: {
         type: mongoose.Schema.Types.ObjectId,
         ref : "User"
     },
     status: {
         type: String,
         required: true,
+        default: 'pending',
     },
     request_send: {
         type: Date,

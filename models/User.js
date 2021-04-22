@@ -51,7 +51,7 @@ const UserSchema = mongoose.Schema({
   },
   purchasedWorkshopsList: [
     {
-      workshopId: {
+      workshop: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Workshop",
         required: true,

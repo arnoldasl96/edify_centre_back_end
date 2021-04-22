@@ -5,46 +5,13 @@ const Booking = require("../models/WorkshopBooking");
 const { FormatDate } = require("./VerificationFunctions");
 
 router.get("/request", async (req, res) => {
-  try {
-    const booking = await Booking.find();
-    if (booking == null)
-      res.status(404).json({ message: " bookings not found" });
-    var response = [];
-    for (let id in booking) {
-      const element = booking[id];
-      const data = {
-        _id: element._id,
-        student: null,
-        workshop: null,
-        info: null,
-      };
-      const workshop = await Workshop.findById(element.workshopId);
-      if (workshop == null)
-        res.status(404).json({ message: " workshop with this id not found" });
-
-      const student = await User.findById(element.userId);
-      if (student == null)
-        res.status(404).json({ message: " student with this id not found" });
-
-      data.workshop = {
-        id: workshop._id,
-        title: workshop.title,
-      };
-      data.student = {
-        id: student._id,
-        fullName: student.firstname + " " + student.lastname,
-        email: student.email,
-      };
-      data.info = {
-        status: element.status,
-        request_send: FormatDate(element.request_send),
-      };
-      response.push(data);
-    }
-    res.json(response);
-  } catch (error) {
-    res.json({ message: error });
-  }
+Booking.find()
+.populate('workshop', 'title')
+.populate('user', 'firstname lastname email')
+.exec()
+.then(booking => {
+ res.status(200).json({booking:booking})
+})
 });
 
 router.get("/request/:id", async (req, res) => {
@@ -59,18 +26,18 @@ router.get("/request/:id", async (req, res) => {
 });
 
 router.post("/request", async (req, res) => {
+  console.log(req.body);
+
   const BookingExists = await Booking.findOne({
-    workshopId: req.body.workshopId,
-    userId: req.body.userId,
-    status: "pending",
+    workshop: req.body.workshop,
+    user: req.body.user,
   });
   if (BookingExists) {
     return res.json({ message: "you have already booked this workshop!" });
   }
   const newBooking = new Booking({
-    workshopId: req.body.workshopId,
-    userId: req.body.userId,
-    status: req.body.status,
+    workshop: req.body.workshop,
+    user: req.body.user,
   });
   try {
     const SavedBooking = await newBooking.save();
@@ -105,11 +72,11 @@ router.patch("/request", async (req, res) => {
       }
     );
     await User.updateOne(
-      { _id: req.body.data.student.id },
+      { _id: req.body.data.user.id },
       {
         $push: {
           purchasedWorkshopsList: {
-            workshopId: req.body.data.workshop.id,
+            workshop: req.body.data.workshop.id,
           },
         },
       }
@@ -118,7 +85,7 @@ router.patch("/request", async (req, res) => {
       { _id: req.body.data.workshop.id },
       {
         $push: {
-          students_list: req.body.data.student.id,
+          students_list: req.body.data.user.id,
         },
       }
     );

@@ -44,7 +44,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.get("/:id/info", async (req, res) => {
+router.get("/:id/testing", async (req, res) => {
   try {
     const workshop = await Workshop.findById(req.params.id);
     if (!workshop) {
@@ -150,6 +150,21 @@ router.patch("/:id/session/:sessionId", async (req, res) => {
   } catch (error) {
     req.json({ message: error });
   }
+});
+router.get("/:id/info", async (req, res) => {
+ Workshop.findById(req.params.id)
+ .populate('sessions')
+ .populate('responsible_person','firstname lastname email _id photo')
+ .populate('students_list',"firstname lastname email _id photo")
+ .exec()
+ .then(workshop => {
+   if(!workshop){
+     return res.status(404).json({
+       message: 'Workshop not found',
+     })
+   }
+   res.status(200).json({workshop:workshop})
+ })
 });
 
 module.exports = router;
