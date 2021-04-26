@@ -3,6 +3,8 @@
 node_modules
 /dist
 /uploads
+/tests
+/coverage
 
 # local env files
 .env

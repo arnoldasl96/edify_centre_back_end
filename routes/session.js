@@ -13,19 +13,18 @@ router.post('/', async(req, res) => {
     })
     try {
         const savedSession = await NewSession.save();
-        res.json({ message: "success", SessionId: savedSession._id });
+        res.status(201).json({ message: "success", SessionId: savedSession._id });
     } catch (error) {
-        console.log(error);
         res.status(400).json({message: error});
     }
 })
 router.delete('/:id', async(req,res)=>{
     try {
         
-    const deletedSession = await Session.remove({_id: req.params.id});
+    const deletedSession = await Session.findByIdAndDelete({_id: req.params.id});
     res.json({deleted: deletedSession})
     } catch (error) {
-        res.json({message: error})
+        res.status(400).json({message: error})
     }
 })
 router.patch('/:id', async(req,res)=>{
@@ -36,7 +35,7 @@ router.patch('/:id', async(req,res)=>{
         res.status(204).json({ session:post});
 
     } catch (err) {
-        res.json({ message: err });
+        res.status(400).json({ message: err });
     }
 
 })

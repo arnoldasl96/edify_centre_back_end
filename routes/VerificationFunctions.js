@@ -71,7 +71,7 @@ function FormatDate(varDate) {
   let year = date_ob.getFullYear();
 
   // current hours
-  let hours = date_ob.getUTCHours();
+  let hours = date_ob.getHours();
   // current minutes
   let minutes = date_ob.getMinutes();
   return year + "-" + month + "-" + date + " " + hours + ":" + minutes;

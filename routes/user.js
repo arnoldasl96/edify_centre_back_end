@@ -10,14 +10,14 @@ router.get("/", async (req, res) => {
       const posts = await User.find();
       res.json(posts);
     } catch (err) {
-      res.json({ message: err });
+      res.status(400).json({ message: err });
     }
   } else {
     try {
       const posts = await User.find(req.query);
       res.json(posts);
     } catch (err) {
-      res.json({ message: err });
+      res.status(400).json({ message: err });
     }
   }
 });
@@ -26,28 +26,25 @@ router.get("/", async (req, res) => {
 router.get("/:userId", async (req, res) => {
   try {
     const post = await User.findById(req.params.userId);
-    if (post == null) res.status(400).json("not found");
+    if (post == null) res.status(404).json("not found");
     else res.json(post);
   } catch (err) {
-    res.json({ message: err });
+    res.status(400).json({ message: err });
   }
 });
 
 router.get("/:userId/workshops", async (req, res) => {
   try {
-    const workshopsList = [];
     const user = await User.findById(req.params.userId);
     if (user) {
-      const userWorkshopsids = user.purchasedWorkshopsList;
-      for (let id = 0; id < userWorkshopsids.length; id++) {
-        const element = userWorkshopsids[id];
-        const workshop = await Workshop.findById(element.workshopId);
-        workshopsList.push(workshop);
-      }
-      res.json(workshopsList);
+      user.populate('purchasedWorkshopsList');
+      res.json(user.purchasedWorkshopsList);
+    }
+    else {
+      throw Error();
     }
   } catch (error) {
-    res.json({ message: error });
+    res.status(404).json({ message: error });
   }
 });
 
@@ -55,10 +52,10 @@ router.get("/:userId/workshops", async (req, res) => {
 
 router.delete("/:userId", async (req, res) => {
   try {
-    const post = await User.remove({ _id: req.params.userId });
+    const post = await User.findByIdAndDelete({ _id: req.params.userId });
     res.json(post);
   } catch (err) {
-    res.json({ message: err });
+    res.status(404).json({ message: err });
   }
 });
 //UPDATE
@@ -68,9 +65,9 @@ router.patch("/:id", async (req, res) => {
     const id = req.params.id;
     const update = req.body;
     const post = await User.findByIdAndUpdate(id, update);
-    res.status(204).json(post);
+    res.status(204).json({post});
   } catch (err) {
-    res.json({ message: err });
+    res.status(400).json({ message: err });
   }
 });
 module.exports = router;

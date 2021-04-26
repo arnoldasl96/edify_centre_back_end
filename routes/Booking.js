@@ -15,19 +15,13 @@ Booking.find()
 });
 
 router.get("/request/:id", async (req, res) => {
-  try {
     const booking = await Booking.findById(req.params.id);
-    if (booking == null)
-      res.status(404).json({ message: "booking with this id not found" });
-    res.json(booking);
-  } catch (error) {
-    res.json({ message: error });
-  }
+    if(!booking) return res.status(404).json({message:" not found"});
+    res.status(200).json({booking});
+
 });
 
 router.post("/request", async (req, res) => {
-  console.log(req.body);
-
   const BookingExists = await Booking.findOne({
     workshop: req.body.workshop,
     user: req.body.user,
@@ -52,7 +46,7 @@ router.post("/request", async (req, res) => {
 
 router.patch("/request", async (req, res) => {
   if (req.body.status === "declined") {
-    const declinedBooking = await Booking.updateOne(
+    const declinedBooking = await Booking.findByIdAndUpdate(
       { _id: req.body.data._id },
       {
         $set: {
@@ -60,10 +54,10 @@ router.patch("/request", async (req, res) => {
         },
       }
     );
-    res.json(declinedBooking);
+  return  res.status(203).json({declinedBooking});
   }
   if (req.body.status === "accepted") {
-    await Booking.updateOne(
+    await Booking.findByIdAndUpdate(
       { _id: req.body.data._id },
       {
         $set: {
@@ -71,26 +65,27 @@ router.patch("/request", async (req, res) => {
         },
       }
     );
-    await User.updateOne(
-      { _id: req.body.data.user.id },
+    await User.findByIdAndUpdate(
+      { _id: req.body.data.user._id },
       {
         $push: {
           purchasedWorkshopsList: {
-            workshop: req.body.data.workshop.id,
+            workshop: req.body.data.workshop._id,
           },
         },
       }
     );
-    await Workshop.updateOne(
-      { _id: req.body.data.workshop.id },
+    await Workshop.findByIdAndUpdate(
+      { _id: req.body.data.workshop._id },
       {
         $push: {
-          students_list: req.body.data.user.id,
+          students_list: req.body.data.user._id,
         },
       }
     );
-    res.json("updated");
+  return res.status(203).json({message:"updated"});
   }
+  res.status(400).json({error:"status code not found"})
 });
 
 module.exports = router;
