@@ -15,10 +15,10 @@ const sessionRoute = require('./routes/session')
 const bookingRoute = require('./routes/Booking')
 
 app.use(express.json());
-app.use('/user', authRoute)
-app.use('/user', usersRoute)
-app.use('/workshop', workshopRoute)
-app.use('/files', filesRoute)
-app.use('/session', sessionRoute)
-app.use('/booking', bookingRoute)
+app.use('/api/user', authRoute)
+app.use('/api/user', usersRoute)
+app.use('/api/workshop', workshopRoute)
+app.use('/api/files', filesRoute)
+app.use('/api/session', sessionRoute)
+app.use('/api/booking', bookingRoute)
 module.exports = app;
