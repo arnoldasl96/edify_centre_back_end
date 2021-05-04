@@ -51,16 +51,9 @@ const UserSchema = mongoose.Schema({
   },
   purchasedWorkshopsList: [
     {
-      workshop: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Workshop",
-        required: true,
-      },
-      purchasedDate: {
-        type: Date,
-        default: Date.now(),
-      },
-    },
+    }
   ],
 });
 

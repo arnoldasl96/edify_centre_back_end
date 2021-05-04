@@ -35,14 +35,17 @@ router.get("/:userId", async (req, res) => {
 
 router.get("/:userId/workshops", async (req, res) => {
   try {
-    const user = await User.findById(req.params.userId);
-    if (user) {
-      user.populate('purchasedWorkshopsList');
-      res.json(user.purchasedWorkshopsList);
-    }
-    else {
-      throw Error();
-    }
+    User.findById(req.params.userId)
+      .populate("purchasedWorkshopsList")
+      .exec()
+      .then((user) => {
+        if (!user) {
+          return res.status(404).json({
+            message: "Workshops not found",
+          });
+        }
+        res.status(200).json(user.purchasedWorkshopsList);
+      });
   } catch (error) {
     res.status(404).json({ message: error });
   }
@@ -65,7 +68,7 @@ router.patch("/:id", async (req, res) => {
     const id = req.params.id;
     const update = req.body;
     const post = await User.findByIdAndUpdate(id, update);
-    res.status(204).json({post});
+    res.status(204).json({ post });
   } catch (err) {
     res.status(400).json({ message: err });
   }

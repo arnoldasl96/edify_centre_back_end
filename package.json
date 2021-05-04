@@ -21,7 +21,10 @@
       "**/*.{js,jsx}",
       "!**/node_modules/**",
       "!**/vendor/**",
+      "!**/index.js/**",
+      "!**/routes/auth.js/**",
       "!**/coverage/**"
+      
     ]
   },
   "author": "",

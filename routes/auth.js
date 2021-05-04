@@ -6,6 +6,7 @@ const {
   RegisterValidation,
   generateAccessToken,
   generateRefreshToken,
+  isLoggedIn,
 } = require("./VerificationFunctions");
 const bcrypt = require("bcryptjs");
 
@@ -69,5 +70,7 @@ router.post("/registration", async (req, res) => {
     res.status(400).json({ message: error });
   }
 });
+router.post("/token",isLoggedIn, async (req,res) =>{
 
+});
 module.exports = router;

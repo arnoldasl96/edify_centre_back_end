@@ -25,7 +25,7 @@ const RegisterValidation = (newUser) => {
 
 function generateAccessToken(user) {
   return jwt.sign({ user: user }, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: "15m",
+    expiresIn: "15min",
   });
 }
 
@@ -33,29 +33,27 @@ function generateRefreshToken(user) {
   return jwt.sign({ user }, process.env.REFRESH_TOKEN_SECRET);
 }
 const isLoggedIn = (req, res, next) => {
-  const authHeader = req.header["authorization"];
+  const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
   if (!token) return res.status(401).json({ message: "access denided" });
-
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (error, user) => {
-    if (error) return res.status(403).json({ message: "token is invalid" });
+    if (error) return res.status(401).json({ message: "token is invalid" });
     req.user = user;
     next();
   });
 };
 const isAdministrator = (req, res, next) => {
-  const authHeader = req.header["authorization"];
+  const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
   if (!token) return res.status(401).json({ message: "access denided" });
-
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (error, user) => {
-    if (error) return res.status(403).json("token is invalid");
-    if (user.role != "admin") {
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (error, payload) => {
+    if (error) return res.status(401).json("token is invalid");
+    if (payload.user.role != "admin") {
       return res
         .status(403)
         .json({ message: "access denided - you don't have permition!" });
     }
-    req.user = user;
+    req.user = payload.user;
     next();
   });
 };

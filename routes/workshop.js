@@ -2,8 +2,9 @@ const router = require("express").Router();
 const Workshop = require("../models/Workshop");
 const Session = require("../models/Session");
 const User = require("../models/User");
+const { isLoggedIn, isAdministrator } = require("./VerificationFunctions");
 
-router.get("/", async (req, res) => {
+router.get("/", isLoggedIn, async (req, res) => {
   try {
     const workshop = await Workshop.find();
     res.json(workshop);
@@ -12,7 +13,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", isLoggedIn, async (req, res) => {
   try {
     const workshop = await Workshop.findById(req.params.id);
 
@@ -21,7 +22,7 @@ router.get("/:id", async (req, res) => {
     res.status(404).json({ message: err });
   }
 });
-router.post("/", async (req, res) => {
+router.post("/", isAdministrator, async (req, res) => {
   const NewWorkshop = new Workshop({
     title: req.body.title,
     description: req.body.description,
@@ -42,7 +43,7 @@ router.post("/", async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 });
-router.patch("/:id", async (req, res) => {
+router.patch("/:id", isAdministrator, async (req, res) => {
   try {
     const id = req.params.id;
     const update = req.body;
@@ -52,7 +53,7 @@ router.patch("/:id", async (req, res) => {
     res.status(400).json({ message: err });
   }
 });
-router.patch("/:id/sessions", async (req, res) => {
+router.patch("/:id/sessions", isAdministrator, async (req, res) => {
   try {
     const id = req.params.id;
     const update = req.body.sessionId;
@@ -66,7 +67,7 @@ router.patch("/:id/sessions", async (req, res) => {
   }
 });
 
-router.patch("/:id/session/:sessionId", async (req, res) => {
+router.patch("/:id/session/:sessionId", isAdministrator, async (req, res) => {
   try {
     const session = await Session.findByIdAndDelete({
       _id: req.params.sessionId,
@@ -84,20 +85,20 @@ router.patch("/:id/session/:sessionId", async (req, res) => {
     req.status(400).json({ message: error });
   }
 });
-router.get("/:id/info", async (req, res) => {
- Workshop.findById(req.params.id)
- .populate('sessions')
- .populate('responsible_person','firstname lastname email _id photo')
- .populate('students_list',"firstname lastname email _id photo")
- .exec()
- .then(workshop => {
-   if(!workshop){
-     return res.status(404).json({
-       message: 'Workshop not found',
-     })
-   }
-   res.status(200).json({workshop:workshop})
- })
+router.get("/:id/info", isLoggedIn, async (req, res) => {
+  Workshop.findById(req.params.id)
+    .populate("sessions")
+    .populate("responsible_person", "firstname lastname email _id photo")
+    .populate("students_list", "firstname lastname email _id photo")
+    .exec()
+    .then((workshop) => {
+      if (!workshop) {
+        return res.status(404).json({
+          message: "Workshop not found",
+        });
+      }
+      res.status(200).json({ workshop: workshop });
+    });
 });
 
 module.exports = router;

@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const Session = require('../models/Session')
+const Session = require('../models/Session');
+const { isLoggedIn } = require('./VerificationFunctions');
 
-router.post('/', async(req, res) => {
+router.post('/',isLoggedIn, async(req, res) => {
     const NewSession = new Session({
         title: req.body.title,
         description: req.body.description,
@@ -22,7 +23,7 @@ router.delete('/:id', async(req,res)=>{
     try {
         
     const deletedSession = await Session.findByIdAndDelete({_id: req.params.id});
-    res.json({deleted: deletedSession})
+    res.status(204).json({deleted: deletedSession})
     } catch (error) {
         res.status(400).json({message: error})
     }

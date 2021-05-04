@@ -2,9 +2,9 @@ const router = require("express").Router();
 const User = require("../models/User");
 const Workshop = require("../models/Workshop");
 const Booking = require("../models/WorkshopBooking");
-const { FormatDate } = require("./VerificationFunctions");
+const { isLoggedIn, isAdministrator } = require("./VerificationFunctions");
 
-router.get("/request", async (req, res) => {
+router.get("/request", isAdministrator, async (req, res) => {
 Booking.find()
 .populate('workshop', 'title')
 .populate('user', 'firstname lastname email')
@@ -21,7 +21,7 @@ router.get("/request/:id", async (req, res) => {
 
 });
 
-router.post("/request", async (req, res) => {
+router.post("/request", isLoggedIn, async (req, res) => {
   const BookingExists = await Booking.findOne({
     workshop: req.body.workshop,
     user: req.body.user,
@@ -44,7 +44,7 @@ router.post("/request", async (req, res) => {
   }
 });
 
-router.patch("/request", async (req, res) => {
+router.patch("/request", isAdministrator, async (req, res) => {
   if (req.body.status === "declined") {
     const declinedBooking = await Booking.findByIdAndUpdate(
       { _id: req.body.data._id },
@@ -69,9 +69,7 @@ router.patch("/request", async (req, res) => {
       { _id: req.body.data.user._id },
       {
         $push: {
-          purchasedWorkshopsList: {
-            workshop: req.body.data.workshop._id,
-          },
+          purchasedWorkshopsList: req.body.data.workshop._id,
         },
       }
     );
