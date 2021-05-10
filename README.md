@@ -1,3 +1,5 @@
 # edify_centre_API
 
-api for edify centre
+to install node modules -> npm install 
+to start server -> npm start
+
